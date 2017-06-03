@@ -2,21 +2,29 @@
  * @Author: yxp
  * @Date:   2017-06-02 14:06:33
  * @Last modified by:   yxp
- * @Last modified time: 2017-06-02 14:06:34
+ * @Last modified time: 2017-06-03 17:06:32
  */
  import React, {Component} from 'react';
  import {AppRegistry, StyleSheet, Text, Button, View} from 'react-native';
 
- import {StackNavigator} from 'react-navigation';
+ import {StackNavigator, TabNavigator} from 'react-navigation';
  // import codePush from "react-native-code-push";
 
- import Movies from './common/components/Movies.js';
- import Movie from './common/components/Movie.js';
+ import Movies, {MoviesShowing, MoviesTop} from './common/pages/Movies.js';
+ import Movie from './common/pages/Movie.js';
 
+ const MoviesNavigator = TabNavigator({
+   Showing: {
+       screen: MoviesShowing
+   },
+   Top: {
+       screen: MoviesTop
+   },
+ });
 
  const App = StackNavigator({
      Home: {
-         screen: Movies
+         screen: MoviesNavigator
      },
      MovieDetail: {
          screen: Movie

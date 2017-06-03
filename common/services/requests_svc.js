@@ -2,7 +2,7 @@
  * @Author: yxp
  * @Date:   2017-05-31 16:05:31
  * @Last modified by:   yxp
- * @Last modified time: 2017-06-02 15:06:13
+ * @Last modified time: 2017-06-02 19:06:20
  */
 export default {
     moviesShowingReq: 'https://api.douban.com/v2/movie/in_theaters',
@@ -13,7 +13,7 @@ export default {
 }
 
 export function resource(url, params = {}) {
-   const _url = url.replace(/\/:(\w+)\/?/g, function (m, p1) {
+   const _url = url.replace(/\/:(\w+)/g, function (m, p1) {
        var value = params[p1];
        if (value) {
            delete params[p1];

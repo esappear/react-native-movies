@@ -2,7 +2,7 @@
  * @Author: yxp
  * @Date:   2017-05-31 17:05:68
  * @Last modified by:   yxp
- * @Last modified time: 2017-06-02 15:06:02
+ * @Last modified time: 2017-06-03 18:06:41
  */
 import React, { Component } from 'react';
 import {
@@ -16,8 +16,10 @@ import {
 import requests from '../services/requests_svc'
 import {
     StackNavigator,
+    TabNavigator,
     NavigationActions,
 } from 'react-navigation';
+import Loading from '../components/Loading.js';
 
 export default class Movies extends Component {
     static navigationOptions = {
@@ -29,13 +31,15 @@ export default class Movies extends Component {
         var ds = new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2});
         this.state = {
             movies: ds.cloneWithRows([]),
+            loading: !0,
         }
     }
 
     fetchData () {
-        fetch(requests.moviesShowingReq).then(response => response.json()).then(responseJson => {
+        fetch(requests[this.props.type || 'moviesTopReq']).then(response => response.json()).then(responseJson => {
             this.setState({
                 movies: this.state.movies.cloneWithRows(responseJson.subjects),
+                loading: !1,
                 title: responseJson.title
             });
         })
@@ -53,12 +57,36 @@ export default class Movies extends Component {
     render () {
         return (
             <View style={{flex: 1}}>
-                <ListView
+                {this.state.loading ? <Loading /> :
+                    <ListView
                     dataSource={this.state.movies}
                     renderRow={(rowData) => <MovieItem onPress={() => {this._onPressButton(rowData)}}>{rowData}</MovieItem>}
                     enableEmptySections={true}
-                />
+                    />
+                }
             </View>
+        )
+    }
+}
+
+export class MoviesShowing extends Component {
+    static navigationOptions = {
+        title: '影院热映'
+    };
+    render () {
+        return (
+            <Movies type="moviesShowingReq" navigation={this.props.navigation} />
+        )
+    }
+}
+
+export class MoviesTop extends Component {
+    static navigationOptions = {
+        title: '电影Top250'
+    };
+    render () {
+        return (
+            <Movies type="moviesTopReq" navigation={this.props.navigation} />
         )
     }
 }
@@ -71,12 +99,24 @@ class MovieItem extends Component {
     render () {
         const movie = this.props.children;
         return (
-            <TouchableHighlight onPress={this.props.onPress}>
-                <View style={{flex: 1, backgroundColor: 'white', padding: 15, marginTop: 10}}>
+            <TouchableHighlight onPress={this.props.onPress} style={{marginTop: 10}}>
+                <View style={{backgroundColor: 'white', padding: 15, flexDirection: 'row'}}>
                     <Image source={{uri: movie.images.large}} style={{width: 150, height: 217}}></Image>
-                    <Text style={{marginTop: 10}}>{movie.title}</Text>
+                    <View style={{paddingHorizontal: 10, flex: 1}}>
+                        <Text style={{fontSize: 16, fontWeight: 'bold'}}>{movie.title}</Text>
+                        <Text style={styles.title}>导演</Text>
+                        {movie.directors.map(item => <Text key={item.id}>{item.name}</Text>)}
+                        <Text style={styles.title}>演员</Text>
+                        {movie.casts.map(item => <Text key={item.id}>{item.name}</Text>)}
+                    </View>
                 </View>
             </TouchableHighlight>
         )
     }
 }
+
+const styles = StyleSheet.create({
+    title: {
+        fontWeight: 'bold', fontSize: 14, marginTop: 5,
+    }
+})
