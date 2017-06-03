@@ -2,7 +2,7 @@
  * @Author: yxp
  * @Date:   2017-06-01 17:06:38
  * @Last modified by:   yxp
- * @Last modified time: 2017-06-03 19:06:13
+ * @Last modified time: 2017-06-03 22:06:57
  */
  import React, {Component} from 'react';
  import {
@@ -12,12 +12,13 @@
      ScrollView,
      Image,
      TouchableHighlight,
-     StyleSheet
+     StyleSheet,
+     findNodeHandle,
  } from 'react-native';
  import {StackNavigator, NavigationActions} from 'react-navigation';
  import requests, {resource} from '../services/requests_svc'
  import Loading from '../components/Loading.js';
- // import { BlurView } from 'react-native-blur';
+ import { BlurView } from 'react-native-blur';
 
  export default class Movie extends Component {
      static navigationOptions = ({navigation}) => ({
@@ -29,6 +30,7 @@
         this.state = {
             movie: null,
             loading: !0,
+            viewRef: null,
         }
      }
 
@@ -68,6 +70,10 @@
         //  this.fetchReviews();
      }
 
+     imageLoaded () {
+         this.setState({viewRef: findNodeHandle(this.backgroundImage)});
+     }
+
      render () {
          const movie = this.state.movie;
          const comments = this.state.comments;
@@ -77,8 +83,19 @@
                 {this.state.loading ? <Loading /> :
                     (movie && (
                         <ScrollView>
-                            <View style={{alignItems: 'center', paddingTop: 10}}>
-                                <Image source={{uri: movie.images.large}} style={{width: 150, height: 217}}></Image>
+                            <View style={{alignItems: 'center', padding: 10, justifyContent: 'center'}}>
+                                <Image source={{uri: movie.images.large}} style={styles.absolute} ref={(img) => {this.backgroundImage = img}} onLoadEnd={this.imageLoaded.bind(this)} />
+                                {this.state.viewRef && (
+                                    <BlurView
+                                        style={styles.absolute}
+                                        viewRef={this.state.viewRef}
+                                        blurType="dark"
+                                        blurRadius={25}
+                                        blurAmount={25}
+                                    />
+                                )}
+                                <View style={[styles.absolute, styles.cover]}></View>
+                                <Image source={{uri: movie.images.large}} style={{width: 150, height: 217}} />
                             </View>
                             <View style={{padding: 10}}>
                                 <Text style={styles.title}>电影简介</Text>
@@ -104,5 +121,11 @@
  const styles = StyleSheet.create({
      title: {
          fontWeight: 'bold', fontSize: 14, marginTop: 5,
-     }
+     },
+     absolute: {
+         position: "absolute",
+         top: 0, left: 0, bottom: 0, right: 0,
+         borderWidth: 0,
+     },
+     cover: {backgroundColor: 'white', opacity: .3}
  })
