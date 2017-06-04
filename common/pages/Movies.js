@@ -2,7 +2,7 @@
  * @Author: yxp
  * @Date:   2017-05-31 17:05:68
  * @Last modified by:   yxp
- * @Last modified time: 2017-06-03 18:06:41
+ * @Last modified time: 2017-06-04 20:06:99
  */
 import React, { Component } from 'react';
 import {
@@ -13,7 +13,7 @@ import {
     TouchableHighlight,
     StyleSheet,
 } from 'react-native';
-import requests from '../services/requests_svc'
+import requests, {resource} from '../services/requests_svc'
 import {
     StackNavigator,
     TabNavigator,
@@ -33,14 +33,21 @@ export default class Movies extends Component {
             movies: ds.cloneWithRows([]),
             loading: !0,
         }
+        this._movies = [];
     }
 
     fetchData () {
-        fetch(requests[this.props.type || 'moviesTopReq']).then(response => response.json()).then(responseJson => {
+        var params = {};
+        this._movies.length && (params.start = this._movies.length + 1);
+        this.setState({
+            loading: !0
+        });
+        resource(requests[this.props.type || 'moviesTopReq'], params).then(responseJson => {
+            this._movies = this._movies.concat(responseJson.subjects);
             this.setState({
-                movies: this.state.movies.cloneWithRows(responseJson.subjects),
+                movies: this.state.movies.cloneWithRows(this._movies),
                 loading: !1,
-                title: responseJson.title
+                title: responseJson.title,
             });
         })
     }
@@ -57,13 +64,15 @@ export default class Movies extends Component {
     render () {
         return (
             <View style={{flex: 1}}>
-                {this.state.loading ? <Loading /> :
+                {this._movies.length > 0 &&
                     <ListView
                     dataSource={this.state.movies}
                     renderRow={(rowData) => <MovieItem onPress={() => {this._onPressButton(rowData)}}>{rowData}</MovieItem>}
                     enableEmptySections={true}
+                    onEndReached={this.fetchData.bind(this)}
                     />
                 }
+                {this.state.loading && <Loading />}
             </View>
         )
     }
