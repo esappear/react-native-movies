@@ -2,7 +2,7 @@
  * @Author: yxp
  * @Date:   2017-05-31 17:05:68
  * @Last modified by:   yxp
- * @Last modified time: 2017-06-04 20:06:99
+ * @Last modified time: 2017-06-11 22:06:47
  */
 import React, { Component } from 'react';
 import {
@@ -20,6 +20,7 @@ import {
     NavigationActions,
 } from 'react-navigation';
 import Loading from '../components/Loading.js';
+import Stars from '../components/Stars.js';
 
 export default class Movies extends Component {
     static navigationOptions = {
@@ -113,6 +114,10 @@ class MovieItem extends Component {
                     <Image source={{uri: movie.images.large}} style={{width: 150, height: 217}}></Image>
                     <View style={{paddingHorizontal: 10, flex: 1}}>
                         <Text style={{fontSize: 16, fontWeight: 'bold'}}>{movie.title}</Text>
+                        <View style={{flexDirection: 'row', marginVertical: 5}}>
+                            <Stars value={movie.rating.average} full={movie.rating.max} />
+                            <Text style={{marginLeft: 5}}>{movie.rating.average}</Text>
+                        </View>
                         <Text style={styles.title}>导演</Text>
                         {movie.directors.map(item => <Text key={item.id}>{item.name}</Text>)}
                         <Text style={styles.title}>演员</Text>

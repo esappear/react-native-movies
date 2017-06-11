@@ -2,7 +2,7 @@
  * @Author: yxp
  * @Date:   2017-06-01 17:06:38
  * @Last modified by:   yxp
- * @Last modified time: 2017-06-03 22:06:57
+ * @Last modified time: 2017-06-11 23:06:77
  */
  import React, {Component} from 'react';
  import {
@@ -19,6 +19,7 @@
  import requests, {resource} from '../services/requests_svc'
  import Loading from '../components/Loading.js';
  import { BlurView } from 'react-native-blur';
+ import Stars from '../components/Stars.js';
 
  export default class Movie extends Component {
      static navigationOptions = ({navigation}) => ({
@@ -98,6 +99,10 @@
                                 <Image source={{uri: movie.images.large}} style={{width: 150, height: 217}} />
                             </View>
                             <View style={{padding: 10}}>
+                                <View style={{flexDirection: 'row', marginVertical: 5}}>
+                                    <Stars value={movie.rating.average} full={movie.rating.max} />
+                                    <Text style={{marginLeft: 5}}>{movie.rating.average}</Text>
+                                </View>
                                 <Text style={styles.title}>电影简介</Text>
                                 <Text>{movie.summary}</Text>
                                 <Text style={styles.title}>导演</Text>
